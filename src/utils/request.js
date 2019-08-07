@@ -13,12 +13,16 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
   config => {
+    console.log('in if 1')
     // 后台使用jwt时候发送post请求必须使用 formdata模式
     if (config.method === 'post') {
       // JSON 转换为 FormData
-      const formData = new FormData()
-      Object.keys(config.data).forEach(key => formData.append(key, config.data[key]))
-      config.data = formData
+      if (config.data) {
+        console.log('in if 2')
+        const formData = new FormData()
+        Object.keys(config.data).forEach(key => formData.append(key, config.data[key]))
+        config.data = formData
+      }
     }
     if (store.getters.token) {
       // let each request carry token
@@ -28,9 +32,6 @@ service.interceptors.request.use(
       config.headers.Authorization = getToken()
     }
     config.headers['Content-Type'] = 'application/json'
-    // config.headers['Access-Control-Allow-Origin'] = '*'
-    // config.headers['Access-Control-Allow-Headers'] = 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild'
-    // config.headers['Access-Control-Allow-Methods'] = 'PUT,POST,GET,DELETE,OPTIONS'
     return config
   },
   error => {
